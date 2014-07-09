@@ -1,0 +1,5 @@
+virtuoso-opensource-7.1 virtuoso-opensource-7.1/dba-password password dba
+virtuoso-opensource-7.1 virtuoso-opensource-7.1/dba-password-again password dba
+mysql-server mysql-server/root_password_again password admin
+mysql-server mysql-server/root_password password admin
+

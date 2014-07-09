@@ -19,25 +19,20 @@ RUN apt-get -y install wget
 WORKDIR /root
 # provisioning as described at http://stack.linkeddata.org/download-and-install/
 # download the repository package
-RUN wget http://stack.linkeddata.org/ldstable-repository.deb
+RUN wget http://stack.lod2.eu/deb/lod2testing-repository.deb
 # install the repository package
-RUN dpkg -i ldstable-repository.deb
+RUN dpkg -i lod2testing-repository.deb
 # update the repository database
 RUN apt-get update
-# install lod2-virtuoso-opensource
-RUN apt-get -y install lod2-virtuoso-opensource
 
-# RUN apt-get -y install ontowiki-virtuoso
-RUN apt-get -y install spatial-semantic-browser
-RUN apt-get -y install dbpedia-spotlight-ui
+# set default answers to deployment questions by packages to a temp file 
+ADD lod2debconfiguration /tmp/lod2debconfiguration
+RUN debconf-set-selections /tmp/lod2debconfiguration 
 RUN apt-get -y install lod2demo
-
-# to ensure that all configuration changes are applied
-RUN service tomcat6 restart
-
 
 EXPOSE 80
 EXPOSE 1111
 EXPOSE 8890
 
 # CMD /root/start.sh
+# After deployment we have to update the root pwd of Virtuoso both in the server as in the bd.ini file
