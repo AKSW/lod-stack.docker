@@ -14,25 +14,34 @@ ENV DEBIAN_FRONTEND noninteractive
 # update ubuntu 
 RUN apt-get update
 RUN apt-get -y upgrade
-RUN apt-get -y install wget
+RUN apt-get -y install wget build-essential software-properties-common apt-utils supervisor byobu curl git htop man unzip vim wget make zsh exuberant-ctags lsb-release
+
+RUN \
+  mkdir -p /root/.config/ /root/.cache/ && \
+  git clone https://github.com/seebi/zshrc.git /root/.config/zsh/ && \
+  cd /root/.config/zsh && \
+  make install && \
+  chsh -s /usr/bin/zsh root && \
+  ln -s /root/.config/zsh/zshrc /root/.zshrc
+
 
 WORKDIR /root
-# provisioning as described at http://stack.linkeddata.org/download-and-install/
-# download the repository package
+
+# download and install the repository package
 RUN wget http://stack.lod2.eu/deb/lod2testing-repository.deb
-# install the repository package
 RUN dpkg -i lod2testing-repository.deb
-# update the repository database
 RUN apt-get update
 
 # set default answers to deployment questions by packages to a temp file 
-ADD lod2debconfiguration /tmp/lod2debconfiguration
-RUN debconf-set-selections /tmp/lod2debconfiguration 
-RUN apt-get -y install lod2demo
+ADD lod2debconfiguration /etc/lod2debconfiguration
+RUN debconf-set-selections /etc/lod2debconfiguration 
+RUN apt-get -y install ontowiki-virtuoso lod2-virtuoso-opensource php5-odbc libapache2-mod-php5
+# RUN apt-get -y install lod2demo
 
-EXPOSE 80
-EXPOSE 1111
-EXPOSE 8890
+ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# CMD /root/start.sh
+
+EXPOSE 80 1111 8890
+
+CMD ["/usr/bin/supervisord"]
 # After deployment we have to update the root pwd of Virtuoso both in the server as in the bd.ini file
