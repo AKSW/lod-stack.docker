@@ -59,10 +59,9 @@ RUN \
   apt-get -y install lod2demo
 
 # after this the whole lod2 stack in deployed and running except the 
+# d2r-cordis environment. 
+# this has to be done manually
 
-# RUN apt-get -y install lod2demo
-#
-#
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
