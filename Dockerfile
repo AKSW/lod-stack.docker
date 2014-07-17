@@ -36,12 +36,38 @@ RUN apt-get update
 ADD lod2debconfiguration /etc/lod2debconfiguration
 RUN debconf-set-selections /etc/lod2debconfiguration 
 RUN apt-get -y install ontowiki-virtuoso lod2-virtuoso-opensource php5-odbc libapache2-mod-php5
+#
+# activate the tomcat7 environment
+RUN apt-get -y install lod2-java7
+RUN apt-get -y install tomcat7
+RUN mv /etc/init.d/tomcat7 /etc/init.d/tomcat7.orig 
+ADD tomcat7 /etc/init.d/tomcat7
+RUN chmod u+x /etc/init.d/tomcat7
+
+# activate the mysql environment
+RUN apt-get -y install mysql-server
+    
+# install the lod2 components with a running
+#  * tomcat7
+#  * virtuoso
+#  * mysql
+#
+RUN \
+  service tomcat7 start \
+  service virtuoso-opensource start \
+  mysqld_safe & \
+  apt-get -y install lod2demo
+
+# after this the whole lod2 stack in deployed and running except the 
+
 # RUN apt-get -y install lod2demo
+#
+#
 
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 
-EXPOSE 80 1111 8890
+EXPOSE 80 8080 1111 8890
 
 CMD ["/usr/bin/supervisord"]
 # After deployment we have to update the root pwd of Virtuoso both in the server as in the bd.ini file
